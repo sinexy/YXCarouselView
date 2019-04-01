@@ -11,10 +11,10 @@
 - (void)carouselView:(YXCarouselView *)carouselView didSelectedIndex:(NSInteger)index;
 ```
 
-效果视频：
-<!--<iframe height=498 width=510 src="https://github.com/sinexy/YXCarouselView/blob/master/carousel.mov" frameborder=0 allowfullscreen></iframe>-->
+效果：
 
-<video controls="" preload="none" poster=""><source src="https://github.com/sinexy/YXCarouselView/blob/master/carousel.mov"></video>
+![YXCarouselView](https://github.com/sinexy/YXCarouselView/blob/master/carousel.gif)
+
 
 
 具体使用方法见 Demo
