@@ -48,16 +48,15 @@ const static NSInteger kScrollSectionMiddle = kScrollSectionMax * 0.5;
         self.dircetion = direction;
         [self addSubview:self.collectionView];
         [self layoutCollectionView];
-        [self initScrollLocation];
+        
     }
     return self;
 }
 
 - (void)start {
-    if ([self initNumbers]) {
+    if (![self initNumbers]) {
         return;
     }
-    [self startScroll];
     [[NSRunLoop mainRunLoop] addTimer:self.autoScrollTimer forMode:NSDefaultRunLoopMode];
 }
 
@@ -70,6 +69,12 @@ const static NSInteger kScrollSectionMiddle = kScrollSectionMax * 0.5;
 
 - (void)reloadData {
     [self.viewDictionaryM removeAllObjects];
+    
+    if ([self.dataSource respondsToSelector:@selector(numberOfItemsInCarouselView:)]) {
+        self.totalItems = [self.dataSource numberOfItemsInCarouselView:self];
+    }
+    [self initNumbers];
+    [self initScrollLocation];
     [self.collectionView reloadData];
 }
 
@@ -100,14 +105,10 @@ const static NSInteger kScrollSectionMiddle = kScrollSectionMax * 0.5;
 }
 
 - (void)initScrollLocation {
-    if ([self.dataSource respondsToSelector:@selector(numberOfItemsInCarouselView:)]) {
-        self.totalItems = [self.dataSource numberOfItemsInCarouselView:self];
-    }
+
     if (self.totalItems == 0) {
         return;
     }
-    self.currentRow = 0;
-    [self initNumbers];
 
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.currentRow inSection:self.currentSection];
     if (self.dircetion == YXCarouselViewRollingDirectionVertical) {
@@ -119,19 +120,18 @@ const static NSInteger kScrollSectionMiddle = kScrollSectionMax * 0.5;
 }
 
 - (void)startScroll {
-    
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.currentRow inSection:self.currentSection];
     if (self.dircetion == YXCarouselViewRollingDirectionVertical) {
         [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredVertically animated:YES];
     }else {
         [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
     }
-
     
     self.currentRow++;
     if (self.currentRow >= self.totalItems) {
         self.currentSection++;
         self.currentRow = 0;
+        
     }
     if (self.currentSection >= kScrollSectionMax) {
         self.currentSection = kScrollSectionMiddle;
@@ -158,11 +158,6 @@ const static NSInteger kScrollSectionMiddle = kScrollSectionMax * 0.5;
 
 #pragma mark - UICollectionView Delegate and DataSource
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
-    
-    if ([self.dataSource respondsToSelector:@selector(numberOfItemsInCarouselView:)]) {
-        self.totalItems = [self.dataSource numberOfItemsInCarouselView:self];
-    }
-    [self initNumbers];
 
     return self.totalSections;
 }
